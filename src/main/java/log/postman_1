@@ -1,0 +1,8 @@
+{
+    "type":"trade_userinfo_get",
+    "trade_userinfo_user_list":{
+    	"user_count":"2",
+    	"user0":"1",
+    	"user1":"2"
+    }
+}

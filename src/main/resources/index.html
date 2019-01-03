@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<script>
+
+    var socket;
+//    if(!window.WebSocket) {
+//        window.WebSocket =window.WebSocket;
+//    }
+
+    if(window.WebSocket) {
+        socket = new WebSocket("ws://localhost:8080/chat");
+        socket.onmessage = function (event) {
+            var  ta =document.getElementById("msgText");
+            ta.value()=ta.value()+'\n'+event.data;
+        }
+        socket.open=function (event) {
+            var ta = document.getElementById("msgText");
+            ta.value = "服务器以建立连接.";
+        }
+
+        socket.close=function (event) {
+            var ta = document.getElementById("msgText");
+            ta.value = "退出聊天室.";
+        }
+    }
+
+    function send(msg) {
+        if(!window.WebSocket){
+            return;
+        }
+        if(socket.readyState=WebSocket.open) {
+            socket.send(msg);
+            var ta = document.getElementById("msgText");
+            ta.value = "服务器以建立连接.";
+        }else {
+            alert("建立连接失败.")
+        }
+
+    }
+
+
+</script>
+<body>
+    <form  action="" onsubmit="return false">
+        <h1> Websocket 多人聊天室!</h1>
+        <textarea id="msgText" cols="100" rows="30">
+
+        </textarea> <br>
+        <input type="text" name="msg" style="width: 300px">
+        <input type="button" value="发送" onclick="send(this.form.msg.value)" >
+        <input type="button" value="清空" onclick="javascript:document.getElementById('msgText').value='  '  ">
+
+
+
+    </form>
+</body>
+</html>

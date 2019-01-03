@@ -1,0 +1,61 @@
+开始游戏后,玩家隔一段时间根据目前情况 返回 环境的数据,
+
+    扫描问题(扫描一定范围的数据)    tank行驶多少
+
+tank开始是有一个变量代表地图中的位置a=(0,0).
+如果扫描器没有发现tank,会向服务器发送请求(发送自己的相对位置(0,0)和 敌人={null)
+    服务器接受请求并给客户端发送默认指令(根据周围情况执行默认操作,并发送a的下一个地址).
+如果发现tank 服务端接受到请求后,执行tank策略.(发送自己的相对位置(0,0)和 敌人=(2,0) )
+    以此类推.
+
+
+if(tank.HP>50){
+    tank.direction=up;
+}
+
+if () {}
+
+有两个解释器:
+    1.解释tankcode
+        1)块 把每一个代码块(codes)先分出来. ---->构建一个字符数组存code.
+        2)分词 将分好的每一个代码块(code)进行分词,根据关键词进行形成可执行的代码.
+            表达式类型 type---->if   while
+            参数      args---->mytank.HP Speed  || 敌人坦克.HP Speed Grade....
+            方法体    exect---->mytank.direction=up
+        3)根据 关键词调用相关函数进行处理.
+            具体实施:
+                1.创建工具类---->eg:  ifUtils     whileUtils     ---->创建继承该类的具体util(包含了默认方法).
+                2.构建解释器---->通过解析器创建操作具体操作对象(包含 加载 系统默认操作) .
+    2.解释对战的信息.
+        1)收到的信息格式为: {mytank=(x,x),otherTank=(y,y),otherTank.PH}
+        2)转化为参数-->传到自己坦克中.
+
+
+/*根据type=init 解析tankcode 生成若干代码块 为一个字符数组 存着多条命令*/
+            String[] codes = new String[2];
+            codes[0] = "IF HAVETANK {tank.PH}>60  tank.location=(x,x)" +
+                        "DO " +
+                        "mytank.move (y,y) " +
+                        "mytank.shot" +
+                        "END";
+            /*根据type=start 解析前端扫描到的数据 生成参数 */
+            String statusFromView = "" +
+                    "{" +
+                    "   mytankId:1" +
+                    "   mytankLocation:(2,2)" +
+                    "   otherTank:null" +
+                    "   otherTankLocation:null" +
+                    "}";
+//            String codeToOpt = codes[0].replace(xxxx);
+
+
+            /*将参数拼接到tank中 之后调用相应的解析器 生成。 */
+            String responseTankStatus ="{" +
+                    "   mytankId:1" +
+                    "   mytankLocation:(2,2)" +
+                    "   otherTank:null" +
+                    "   otherTankLocation:null" +
+                    "}";
+            String codeToOpt =null;
+//            InterpreterUtil2 interpreterUtil2 = new InterpreterUtil2();
+//            interpreterUtil2.opt(codeToOpt);

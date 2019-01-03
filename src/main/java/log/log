@@ -1,0 +1,33 @@
+ALTER TABLE user_tank_info
+  MODIFY COLUMN user_tank_info_id INT(20) NOT NULL AFTER user_id,
+  MODIFY COLUMN user_id INT(20) NOT NULL AFTER id
+
+http://blog.csdn.net/u010688587/article/details/53377873
+
+CREATE TABLE commonMap
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    type VARCHAR(32),
+    map_id INT
+);
+
+ALTER TABLE commonMap ADD down_speed INT NULL;
+ALTER TABLE commonMap ALTER COLUMN HP SET DEFAULT NULL ;
+ALTER TABLE commonMap ALTER COLUMN ATK SET DEFAULT null;
+
+
+-----------------------------------------------------------------------------------------
+CREATE TABLE user_map_list
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    type VARCHAR(32),
+    map_id VARCHAR(32)
+);
+-----------------------------------------------------------------------------------------
+CREATE TABLE user_tank_code_info
+(
+    id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    code VARCHAR(640) NOT NULL
+);

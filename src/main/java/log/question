@@ -1,0 +1,3 @@
+1.new 和把对象赋值为null,有什么区别?  在垃圾回收时,对对象为null且为引用的对象进行回收.
+2.ChannelFutureListener的作用是什么:
+3.

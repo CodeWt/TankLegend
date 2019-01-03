@@ -1,0 +1,20 @@
+需要写一个python服务器，然后请求返回。但是需要解决如何让
+用户写的python文件动起来。
+也就是说python文件能不能动态执行不同的文件
+Client：package org.socket.i;
+    传的数据是{50;[5,1];left;[True,[10,8]]}
+            HP,localspot,direction,environment
+Server：HomeDevice message server
+
+
+接下来需要做的工作
+1.接受前端的python文件
+    如何接受一个文件。
+2.如何将玩家写的python运行起来
+
+需求：
+    1.上传python数据的服务器 用来接收前端写的py代码
+        我需要完成通过路径找到相应的用户文件
+    2.匹配池 用户选择相应的模式 通过相应的模式进入相应的房间 并给前端返回房间中人。
+        这个也可以是一个单独的服务器专门接受匹配信息。
+

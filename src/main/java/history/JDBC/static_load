@@ -1,0 +1,73 @@
+package utils;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+/**
+ * @Created by  qiao
+ * @date 18-2-27 上午10:46
+ */
+
+public class C3P0Utils {
+
+    private static ComboPooledDataSource dataSource = new ComboPooledDataSource();
+
+    public static DataSource getDataSource() {
+        return dataSource;
+    }
+
+    public static Connection getConnection() {
+        try {
+            return dataSource.getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    /* c3p0配置文件的数据. */
+//    private static String user;
+//    private static String password;
+//    private static String driverClass;
+//    private static String jdbcUrl;
+//    private static String acquireIncrement;
+//    private static String initialPoolSize;
+//    private static String minPoolSize;
+//    private static String maxPoolSize;
+//    private static String maxStatements;
+//    private static String maxStatementsPerConnection;
+
+    /**
+     * 静态代码块加载配置文件信息
+     */
+//    static {
+//        try {
+//            // 1.创建一个properties对象
+//            Properties props = new Properties();
+//            props.load(new FileInputStream("/home/qiao/桌面/qiaodemo/src/main/resources/c3p0.properties"));
+//            // 2.获取相关参数的值
+//            dataSource = BasicDataSourceFactory.createDataSource(props);
+//
+//            user =props.getProperty("user");
+//            password = props.getProperty("password");
+//            driverClass =props.getProperty("driverClass");
+//            jdbcUrl = props.getProperty("jdbcUrl");
+//            acquireIncrement =props.getProperty("acquireIncrement");
+//            initialPoolSize = props.getProperty("initialPoolSize");
+//            minPoolSize =props.getProperty("minPoolSize");
+//            maxPoolSize = props.getProperty("maxPoolSize");
+//            maxStatements =props.getProperty("maxStatements");
+//            maxStatementsPerConnection = props.getProperty("maxStatementsPerConnection");
+//            System.out.println(user+"  "+password+"  "+driverClass+"  "+password);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//
+//        }
+//
+//    }
+
+
+
+
+}

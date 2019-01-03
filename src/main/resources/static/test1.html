@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>坦克编辑</title>
+    <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+    <script type="text/javascript">
+        var equipType;
+        var equipName;
+        var t='fire'
+        var names=new Array('flame', 'ion', 'laser')
+        var submitChassis
+        var submitFire
+        var initialChassis
+        var initialFire=''
+        window.onload=f
+        function produceXmlhttpObject(){
+            var xmlhttp;
+            if (window.XMLHttpRequest) {
+                // IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+                xmlhttp = new XMLHttpRequest();
+            }
+            else {
+                // IE6, IE5 浏览器执行代码
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            return xmlhttp
+        }
+
+        function openAndSend(xmlhttp,method,url,isBlocking,data){
+            xmlhttp.open(method,url,isBlocking)
+            if (method=='POST'){
+                xmlhttp.send(JSON.stringify(data))
+            }
+        }
+        $(document).ready(
+            getEquipData('fire','flame')
+        )
+        function f() {
+            console.log("===========head==============")
+            var xmlhttp= produceXmlhttpObject()
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    //console.log(xmlhttp.responseText)
+                    var json = JSON.parse(xmlhttp.responseText)
+                    console.log(json.turretName + " " + json.underPanName)
+                    initialChassis = json.underPanName
+                    initialFire = json.turretName;
+                    console.log(initialFire+initialChassis)
+                }
+            }
+            openAndSend(xmlhttp,"POST","http://127.0.0.1:8989",false,{"head":"garage","requestType":"CurrentTank"})
+            //xmlhttp.open("POST", "http://127.0.0.1:8989", false);
+            //xmlhttp.setRequestHeader("access-control-allow-origin","127.0.0.1:8989")
+            //xmlhttp.send(JSON.stringify())
+            document.getElementById("fire").src = "http://127.0.0.1:8080/image?imageId=garage%7C" + initialFire + ".jpg"
+            document.getElementById("chassis").src = "http://127.0.0.1:8080/image?imageId=garage%7C" + initialChassis + ".jpg"
+        }
+
+        function changMyTankImage() {
+            console.log("changMyTankImage-->>"+equipName)
+            if (check(equipName)) {
+                if (equipType == "fire") {
+                    document.getElementById("fire").src = "http://127.0.0.1:8080/image?imageId=garage%7C" + equipName + ".jpg"
+                    submitFire = equipName
+                }
+                if (equipType == "chassis") {
+                    document.getElementById("chassis").src = "http://127.0.0.1:8080/image?imageId=garage%7C" + equipName + ".jpg"
+                    submitChassis = equipName
+                }
+            }else {
+                //lert("你目前没有该装备......")
+                firm(equipName)
+                //window.open('upload.html', 'newwindow', 'height=100, width=400, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=n o, status=no')
+                //buy(equipName)
+            }
+
+        }
+
+        function firm(firm_param) {
+            //利用对话框返回的值 （true 或者 false）
+            if (confirm("您需要用水晶购买此装备才能使用")) {
+                buy(firm_param)
+            }
+            /*else {
+                alert("点击了取消");
+            }
+*/
+        }
+        function changeEquipImage(param) {
+            if (param == 'fire') {
+                getEquipData('fire','flame')
+                t = 'fire'
+                names=['flame','ion','laser']
+
+                document.getElementById("one").src = "http://127.0.0.1:8080/image?imageId=garage%7Cflame.jpg"
+                document.getElementById("two").src = "http://127.0.0.1:8080/image?imageId=garage%7Cion.jpg"
+                document.getElementById("three").src = "http://127.0.0.1:8080/image?imageId=garage%7Claser.jpg"
+                //document.getElementById("four").src = "http://127.0.0.1:8080/image?imageId=garage%7Cwd4.jpeg"
+            }
+            if (param == 'chassis') {
+                getEquipData('chassis','middle')
+                t = 'chassis'
+                names=['middle','light','heavy']
+
+                document.getElementById("one").src = "http://127.0.0.1:8080/image?imageId=garage%7Cmiddle.jpg"
+                document.getElementById("two").src = "http://127.0.0.1:8080/image?imageId=garage%7Clight.jpg"
+                document.getElementById("three").src = "http://127.0.0.1:8080/image?imageId=garage%7Cheavy.jpg"
+                //document.getElementById("four").src = "http://127.0.0.1:8080/image?imageId=garage%7Ckb4.jpg"
+            }
+        }
+
+        function getEquipData(type, name) {
+            equipType = type
+            equipName = name
+            console.log(type + " " + name)
+
+            var xmlhttp= produceXmlhttpObject()
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    console.log("first====="+xmlhttp.responseText)
+                    var json = JSON.parse(xmlhttp.responseText)
+                    console.log(json.name + " " + json.description)
+                    document.getElementById("name").innerHTML = json.name;
+                    document.getElementById("diamond").innerHTML = json.diamond;
+                    document.getElementById("maxSpeed").innerHTML = json.uPMaxSpeed;
+                    document.getElementById("defend").innerHTML = json.uPDefend;
+                    document.getElementById("desc").innerHTML = json.description;
+
+                }
+            }
+            openAndSend(xmlhttp,"POST","http://127.0.0.1:8989",true,{
+                "head": "garage",
+                "requestType": "data",
+                "type": equipType,
+                "name": equipName
+            })
+            /*xmlhttp.open("POST", "http://127.0.0.1:8989", true);
+            //xmlhttp.setRequestHeader("access-control-allow-origin","127.0.0.1:8989")
+            xmlhttp.send(JSON.stringify())
+            //xmlhttp.setRequestHeader("")*/
+        }
+
+        function updateMyTank(var1, var2) {
+
+            console.log(var1 + " " + var2)
+            var xmlhttp= produceXmlhttpObject()
+            openAndSend(xmlhttp,"POST","http://127.0.0.1:8989",true,
+            {
+                "head": "garage",
+                "requestType": "submit",
+                "chassis": submitChassis,
+                "fire": submitFire,
+            });
+            //xmlhttp.setRequestHeader("access-control-allow-origin","127.0.0.1:8989")
+           // xmlhttp.send(JSON.stringify())
+        }
+
+        function check(check_param)
+        {
+            var result=false;
+            var xmlhttp= produceXmlhttpObject()
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    //console.log("checkresult--->>  "+result)
+                    if (xmlhttp.responseText=='ok'){
+                        console.log('result ok...')
+                        result=true
+                    }
+                    //alert(xmlhttp.responseText)
+                }
+            }
+            openAndSend(xmlhttp,"POST","http://127.0.0.1:8989",false, {"head": "garage", "requestType": "equip", "name": check_param});
+            //xmlhttp.open("POST", "http://127.0.0.1:8989", false);
+            //xmlhttp.setRequestHeader("access-control-allow-origin","127.0.0.1:8989")
+            //xmlhttp.send(JSON.stringify())
+            return result
+        }
+        function buy(buy_param)
+        {
+            var re=false
+            console.log("==============buy================")
+            var xmlhttp= produceXmlhttpObject()
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    //console.log("checkresult--->>  "+result)
+                    if (xmlhttp.responseText == 'ok') {
+                        console.log('buy ok...')
+                        re=true
+                    }
+                }
+            }
+            openAndSend(xmlhttp,"POST","http://127.0.0.1:8989",false, {"head": "garage", "requestType": "buy", "name": buy_param})
+            if (re){
+                changMyTankImage(buy_param)
+            }
+        }
+    </script>
+</head>
+<body>
+<div>
+    <img src="" id="fire" width="140mm" height="140mm"/>
+    <img src="" id="chassis" width="300mm" height="300mm"/>
+    <p>
+        <span id="name"></span>
+        <span id="diamond"></span>
+        <span id="maxSpeed"></span>
+        <span id="defend"></span>
+        <span id="desc"></span><br>
+        <input type="button" onclick="changMyTankImage()" value="装备">
+    </p>
+</div>
+<p>
+<div>
+    <img src="http://127.0.0.1:8080/image?imageId=garage%7Cflame.jpg" id="one" onclick="getEquipData(t,names[0])"
+         width="120mm" height="120"/>
+
+    <img src="http://127.0.0.1:8080/image?imageId=garage%7Cion.jpg" id="two" onclick="getEquipData(t,names[1])" width="120mm"
+         height="120"/>
+
+    <img src="http://127.0.0.1:8080/image?imageId=garage%7Claser.jpg" id="three" onclick="getEquipData(t,names[2])"
+         width="120mm" height="120"/>
+
+    <br>
+    <input type="button" value="炮塔" onclick="changeEquipImage('fire')"/>
+    <input type="button" value="主体" onclick="changeEquipImage('chassis')"/>
+</div>
+<br>
+<input type="button" value="提交坦克" onclick="updateMyTank(submitChassis,submitFire)"/>
+</body>
+</html>
+<!--
+$.post({
+type: "POST",
+url: 'http://127.0.0.1:8989',
+async: true,
+data: JSON.stringify({
+"head": "garage",
+"requestType": "data",
+"type": equipType,
+"name": equipName
+}
+),
+contentType: "application/json;charset=utf-8",
+dataType: "json",
+success: function (data) {
+console.log(data)
+//console.log(data.key.address.province+data.key.phones[1].operator+data.key.phones[1].number)
+$("#name").text(data.name)
+$("#diamond").text(data.diamond)
+$("#maxSpeed").text(data.uPMaxSpeed)
+$("#defend").text(data.uPDefend)
+$("#desc").text(data.description)
+}
+});-->
+<!--
+解决ajax处理服务器端返回结果responseText中是JSON的数据。
+
+第一，json格式的文件内容如下：
+
+{
+
+"city":"ShangHai",
+
+"telephone":"123456789"
+
+}
+
+第二，服务器端返回的json数据就是上述的内容在responseText中，现在要取出来，方法有两种：
+
+
+
+方法1：
+
+var json=JSON.parse(request.responseText);
+
+alert(json.city);
+
+
+
+方法2：
+
+
+
+
+var result = request.responseText;
+
+var jsonObject=eval("("+result+")");
+
+alert(jsonObject.telephone);-->

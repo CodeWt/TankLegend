@@ -1,0 +1,298 @@
+package handler;
+
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
+import dao.CommonMap.CommonMap;
+import dao.CommonMap.MapLoad;
+import dao.JsonKeyword;
+import dao.UserMapInfo;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerAdapter;
+import io.netty.channel.ChannelHandlerContext;
+import org.apache.log4j.Logger;
+
+
+import java.io.UnsupportedEncodingException;
+import java.util.*;
+
+import static dao.JsonKeyword.*;
+
+public class MapHandler extends ChannelHandlerAdapter {
+    private static Logger logger = Logger.getLogger(TankHandler.class.getName());
+    UserMapInfo userMapInfo=new UserMapInfo();
+    CommonMap commandMap=new CommonMap();
+    ArrayList<CommonMap> mapInfoArrayList=new ArrayList<>(MAXNUMBMAP);
+
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws JSONException, UnsupportedEncodingException {
+        JSONObject body = (JSONObject) msg;
+        String type = body.getString(JsonKeyword.TYPE);
+        if (type.equalsIgnoreCase(JsonKeyword.MAPINFO)) {
+            JSONArray mapinfoid1 = body.getJSONArray(JsonKeyword.MAPINFOID);
+            Iterator iterator = mapinfoid1.iterator();
+            while (iterator.hasNext()) {
+                JSONObject jsonObject = (JSONObject) iterator.next();
+                System.out.println("------------------------------");
+                System.out.println(jsonObject.get("id"));
+                System.out.println(jsonObject.get("type"));
+                System.out.println(jsonObject.get("mapid"));
+                System.out.println("------------------------------");
+
+            }
+
+//            JSONObject mapinfoid = body.getJSONObject(JsonKeyword.MAPINFOID);
+//            String str = JSON.toJSONString(mapinfoid);
+//            List<MapLoad> mapLoads=JSON.parseArray(str,MapLoad.class);
+//            mapLoads.stream().forEach(System.err::println);
+//            userMapInfo.setUser_id(body.getInteger(JsonKeyword.USERID));
+
+//            JSONObject mapinfoid =body.getJSONObject(JsonKeyword.MAPINFOID);
+//            JSONArray arr=body.getJSONArray(MAPINFO);
+//            String js =JSONObject.toJSONString(arr, SerializerFeature.WriteClassName);
+//            List<CommonMap> collection =JSONObject.parseArray(js,CommonMap.class);
+//            for(int i = 0 ; i < collection.size() ; i++) {
+//                System.out.println(collection.get(i));
+//            }
+//            Iterator<CommonMap> it = collection.iterator();
+//            while (it.hasNext()){
+//                System.out.println(it.next());
+//            }
+//            for (int i=0;i<MAXNUMBMAP;i++){
+//                String  id="id";
+//                JSONObject mapinfoidone =mapinfoid.getJSONObject("id");
+//                commandMap.setId(mapinfoidone.getInteger("id"));
+//                commandMap.setType(mapinfoidone.getString(TYPE));
+//                commandMap.setMap_id(mapinfoidone.getInteger(MAPID));
+//                mapInfoArrayList.add(1, commandMap);
+//            }
+//            for (CommonMap temp:mapInfoArrayList){
+//                System.out.println("*****************");
+//                temp.toString();
+//            }
+            System.out.println("++++++++++++++++++++++++++++           ");
+            logger.info(userMapInfo.toString() + "访问后台返回值===>MapHandler:channelRead");
+            ctx.writeAndFlush(userMapInfo.toString()).addListener(ChannelFutureListener.CLOSE);
+
+
+        } else {
+            ctx.fireChannelRead(msg);
+        }
+
+    }
+
+    private HashMap<String, Object> fromJson2Map(String jsonString) {
+        HashMap jsonMap = JSON.parseObject(jsonString, HashMap.class);
+
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        for(Iterator iter = jsonMap.keySet().iterator(); iter.hasNext();){
+            String key = (String)iter.next();
+            if(jsonMap.get(key) instanceof JSONArray){
+                JSONArray jsonArray = (JSONArray)jsonMap.get(key);
+                List list = handleJSONArray(jsonArray);
+                resultMap.put(key, list);
+            }else{
+                resultMap.put(key, jsonMap.get(key));
+            }
+        }
+        return resultMap;
+    }
+    private  List<HashMap<String, Object>> handleJSONArray(JSONArray jsonArray){
+        List list = new ArrayList();
+        for (Object object : jsonArray) {
+            JSONObject jsonObject = (JSONObject) object;
+            HashMap map = new HashMap<String, Object>();
+            for (Map.Entry entry : jsonObject.entrySet()) {
+                if(entry.getValue() instanceof  JSONArray){
+                    map.put((String)entry.getKey(), handleJSONArray((JSONArray)entry.getValue()));
+                }else{
+                    map.put((String)entry.getKey(), entry.getValue());
+                }
+            }
+            list.add(map);
+        }
+        return list;
+    }
+
+
+}
+
+
+
+
+
+
+package handler;
+
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import dao.CommonMap.CommonMap;
+import dao.CommonMap.MapLoad;
+import dao.JsonKeyword;
+import dao.UserMapInfo;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerAdapter;
+import io.netty.channel.ChannelHandlerContext;
+import org.apache.log4j.Logger;
+
+
+import java.io.UnsupportedEncodingException;
+import java.util.*;
+
+import static dao.JsonKeyword.*;
+
+public class MapHandler extends ChannelHandlerAdapter {
+    private static Logger logger = Logger.getLogger(TankHandler.class.getName());
+    UserMapInfo userMapInfo=new UserMapInfo();
+//    CommonMap commandMap=new CommonMap();
+    private  static MapLoad mapLoad = new MapLoad();
+    private static MapLoad[] mapLoads = new MapLoad[MAXNUMBMAP];
+    private static List<MapLoad> mapInfoArrayList=new ArrayList<>(MAXNUMBMAP);
+
+    public void channelRead(ChannelHandlerContext ctx, Object msg) throws JSONException, UnsupportedEncodingException {
+        JSONObject body = (JSONObject) msg;
+        String type = body.getString(JsonKeyword.TYPE);
+        if (type.equalsIgnoreCase(JsonKeyword.MAPINFO)) {
+            JSONArray mapinfoid1 = body.getJSONArray(JsonKeyword.MAPINFOID);
+//            Iterator iterator = mapinfoid1.iterator();
+//            for (int i=0;i<mapinfoid1.size();i++){
+//                JSONObject jsonObject = (JSONObject) mapinfoid1.get(i);
+//                mapLoad.setId( jsonObject.getInteger("id"));
+//                mapLoad.setType(jsonObject.getString("type"));
+//                mapLoad.setMapid(jsonObject.getString("mapid"));
+//                mapLoads[i]=mapLoad;
+//                mapInfoArrayList.add(mapLoads[i]);
+//                System.out.println(mapLoads[i]);
+//                System.out.println(jsonObject.getInteger("id"));
+//                System.out.println(jsonObject.getString("type"));
+//                System.out.println(jsonObject.getString("mapid"));
+//                System.out.println("------------------------------");
+//            }
+
+            String js =JSONObject.toJSONString(mapinfoid1, SerializerFeature.WriteClassName);
+            mapInfoArrayList =JSONObject.parseArray(js,MapLoad.class);
+            for(int i = 0 ; i < mapInfoArrayList.size() ; i++) {
+                System.out.println(mapInfoArrayList.get(i));
+            }
+
+
+//            while (iterator.hasNext()) {
+//                JSONObject jsonObject = (JSONObject) iterator.next();
+//                System.out.println("------------------------------");
+//                mapLoad.setId( jsonObject.getInteger("id"));
+//                mapLoad.setType(jsonObject.getString("type"));
+//                mapLoad.setMapid(jsonObject.getString("mapid"));
+//                mapInfoArrayList.add(mapLoad);
+////                mapLoads[]=mapLoad;
+//                System.out.println(jsonObject.getInteger("id"));
+//                System.out.println(jsonObject.getString("type"));
+//                System.out.println(jsonObject.getString("mapid"));
+//                System.out.println("------------------------------");
+//
+//            }
+//            System.out.println("00000000000000000--->"+mapInfoArrayList.get(0));
+//            System.out.println("00000000000000000--->"+mapInfoArrayList.get(1));
+//            JSONObject jsonObject;
+//            for (int i=0;i<mapinfoid1.size();i++) {
+//                System.out.println("------------------------------");
+//                mapLoad.setId( jsonObject.getInteger("id"));
+//                mapLoad.setType(jsonObject.getString("type"));
+//                mapLoad.setMapid(jsonObject.getString("mapid"));
+////                mapInfoArrayList.add(mapLoad);
+//                mapLoads[i]=mapLoad;
+//                System.out.println("++++++++++++++++++++++++++++           ");
+//                System.out.println(mapLoads[i]);
+//                System.out.println("++++++++++++++++++++++++++++           ");
+//
+//            }
+//            Iterator i =mapInfoArrayList.iterator();
+//            while (i.hasNext()){
+//                System.out.println(i.next());
+//            }
+
+            logger.info(userMapInfo.toString() + "访问后台返回值===>MapHandler:channelRead");
+            ctx.writeAndFlush(userMapInfo.toString()).addListener(ChannelFutureListener.CLOSE);
+
+
+        } else {
+            ctx.fireChannelRead(msg);
+        }
+
+    }
+
+    private HashMap<String, Object> fromJson2Map(String jsonString) {
+        HashMap jsonMap = JSON.parseObject(jsonString, HashMap.class);
+
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        for(Iterator iter = jsonMap.keySet().iterator(); iter.hasNext();){
+            String key = (String)iter.next();
+            if(jsonMap.get(key) instanceof JSONArray){
+                JSONArray jsonArray = (JSONArray)jsonMap.get(key);
+                List list = handleJSONArray(jsonArray);
+                resultMap.put(key, list);
+            }else{
+                resultMap.put(key, jsonMap.get(key));
+            }
+        }
+        return resultMap;
+    }
+    private  List<HashMap<String, Object>> handleJSONArray(JSONArray jsonArray){
+        List list = new ArrayList();
+        for (Object object : jsonArray) {
+            JSONObject jsonObject = (JSONObject) object;
+            HashMap map = new HashMap<String, Object>();
+            for (Map.Entry entry : jsonObject.entrySet()) {
+                if(entry.getValue() instanceof  JSONArray){
+                    map.put((String)entry.getKey(), handleJSONArray((JSONArray)entry.getValue()));
+                }else{
+                    map.put((String)entry.getKey(), entry.getValue());
+                }
+            }
+            list.add(map);
+        }
+        return list;
+    }
+
+
+}
+
+
+
+=====================================================================================
+ private HashMap<String, Object> fromJson2Map(String jsonString) {
+        HashMap jsonMap = JSON.parseObject(jsonString, HashMap.class);
+
+        HashMap<String, Object> resultMap = new HashMap<String, Object>();
+        for(Iterator iter = jsonMap.keySet().iterator(); iter.hasNext();){
+            String key = (String)iter.next();
+            if(jsonMap.get(key) instanceof JSONArray){
+                JSONArray jsonArray = (JSONArray)jsonMap.get(key);
+                List list = handleJSONArray(jsonArray);
+                resultMap.put(key, list);
+            }else{
+                resultMap.put(key, jsonMap.get(key));
+            }
+        }
+        return resultMap;
+    }
+    private  List<HashMap<String, Object>> handleJSONArray(JSONArray jsonArray){
+        List list = new ArrayList();
+        for (Object object : jsonArray) {
+            JSONObject jsonObject = (JSONObject) object;
+            HashMap map = new HashMap<String, Object>();
+            for (Map.Entry entry : jsonObject.entrySet()) {
+                if(entry.getValue() instanceof  JSONArray){
+                    map.put((String)entry.getKey(), handleJSONArray((JSONArray)entry.getValue()));
+                }else{
+                    map.put((String)entry.getKey(), entry.getValue());
+                }
+            }
+            list.add(map);
+        }
+        return list;
+    }
